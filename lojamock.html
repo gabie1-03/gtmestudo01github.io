@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LojaMock.dev — E-commerce de Teste GTM</title>
+
+  <!-- ✅ COLE SEU GTM AQUI (substitua GTM-XXXXXXX pelo seu ID) -->
+  <!--
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:   #0f172a;
+      --accent:  #e11d48;
+      --green:   #16a34a;
+      --blue:    #2563eb;
+      --bg:      #f9fafb;
+      --surface: #ffffff;
+      --border:  #e5e7eb;
+      --muted:   #6b7280;
+      --text:    #111827;
+      --radius:  10px;
+      --radius-lg: 14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      max-width: 1000px; margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .logo small {
+      font-size: 10px; font-weight: 400; color: var(--muted);
+      margin-left: 8px; font-family: 'DM Mono', monospace;
+      background: #f3f4f6; border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 4px;
+    }
+
+    .cart-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: 8px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; font-weight: 500; transition: opacity 0.15s;
+    }
+    .cart-btn:hover { opacity: 0.85; }
+    .cart-count {
+      background: var(--accent); color: #fff;
+      border-radius: 50%; width: 20px; height: 20px;
+      font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── LAYOUT ─── */
+    .main { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+
+    /* ─── GTM PANEL ─── */
+    .gtm-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      position: sticky; top: 76px;
+    }
+    .gtm-panel-head {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 1rem;
+    }
+    .gtm-badge {
+      background: #1a73e8; color: #fff; font-size: 10px; font-weight: 600;
+      padding: 3px 7px; border-radius: 5px; letter-spacing: 0.5px;
+      font-family: 'DM Mono', monospace;
+    }
+    .gtm-title { font-size: 14px; font-weight: 600; }
+    .gtm-sub { font-size: 12px; color: var(--muted); margin-bottom: 0.75rem; }
+
+    .datalayer-raw {
+      background: #0f172a; color: #94a3b8;
+      border-radius: var(--radius); padding: 0.75rem;
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      max-height: 260px; overflow-y: auto; line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .datalayer-raw .ev-name { color: #7dd3fc; }
+    .datalayer-raw .ev-key  { color: #c084fc; }
+    .datalayer-raw .ev-val  { color: #86efac; }
+    .datalayer-raw .ev-sep  { color: #64748b; }
+
+    .dot-legend {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem;
+    }
+    .dot-item {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--muted);
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .d-pv { background: #94a3b8; }
+    .d-vi { background: #3b82f6; }
+    .d-ac { background: #16a34a; }
+    .d-rc { background: #e11d48; }
+    .d-bc { background: #f59e0b; }
+    .d-pu { background: #8b5cf6; }
+
+    .event-log { display: flex; flex-direction: column; gap: 4px; }
+    .event-entry {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 8px; border-radius: 7px;
+      background: #f9fafb; border: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .event-entry strong { font-weight: 600; font-family: 'DM Mono', monospace; font-size: 11px; }
+    .event-entry span { color: var(--muted); }
+
+    .clear-btn {
+      margin-top: 0.75rem; width: 100%;
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 6px; font-size: 12px;
+      color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    }
+    .clear-btn:hover { background: #f3f4f6; }
+
+    /* ─── PRODUCTS ─── */
+    .section-title { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1rem; }
+
+    .products-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .product-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px;
+      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .product-card:hover {
+      border-color: #9ca3af;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .product-img {
+      width: 100%; aspect-ratio: 1;
+      border-radius: 8px; background: #f3f4f6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; transition: transform 0.2s;
+    }
+    .product-card:hover .product-img { transform: scale(1.05); }
+    .product-meta { flex: 1; }
+    .product-cat { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+    .product-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+    .product-price { font-size: 16px; font-weight: 600; }
+    .add-btn {
+      width: 100%; padding: 8px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: none;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      color: var(--text); transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .add-btn:hover { border-color: var(--brand); background: var(--brand); color: #fff; }
+    .add-btn.added { border-color: var(--green); color: var(--green); background: #f0fdf4; }
+    .add-btn.added:hover { background: #dcfce7; }
+
+    /* ─── CART ─── */
+    #cart-view { display: none; }
+    .cart-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem;
+    }
+    .back-btn {
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 6px 12px;
+      font-size: 13px; cursor: pointer; color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .back-btn:hover { background: #f3f4f6; }
+
+    .cart-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+    .cart-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 14px;
+    }
+    .cart-emoji { font-size: 26px; }
+    .cart-info { flex: 1; }
+    .cart-item-name { font-size: 14px; font-weight: 600; }
+    .cart-item-price { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .qty-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-btn {
+      width: 28px; height: 28px; border-radius: 7px;
+      border: 1px solid var(--border); background: none;
+      font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+    }
+    .qty-btn:hover { background: #f3f4f6; }
+    .qty-val { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+    .remove-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 18px; padding: 4px;
+      transition: color 0.15s;
+    }
+    .remove-btn:hover { color: var(--accent); }
+
+    .cart-summary {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      font-size: 14px; padding: 5px 0; color: var(--muted);
+    }
+    .summary-total {
+      display: flex; justify-content: space-between;
+      font-size: 18px; font-weight: 700; padding-top: 10px;
+      border-top: 1px solid var(--border); margin-top: 8px;
+    }
+    .checkout-btn {
+      width: 100%; margin-top: 1rem; padding: 12px;
+      background: var(--brand); color: #fff; border: none;
+      border-radius: var(--radius); font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .checkout-btn:hover { opacity: 0.85; }
+    .checkout-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ─── SUCCESS ─── */
+    #success-view { display: none; }
+    .success-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+      text-align: center; max-width: 460px; margin: 0 auto;
+    }
+    .success-icon { font-size: 48px; margin-bottom: 1rem; }
+    .success-title { font-size: 20px; font-weight: 700; margin-bottom: 0.5rem; }
+    .success-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .tx-id {
+      display: inline-block; font-family: 'DM Mono', monospace;
+      font-size: 13px; background: #f3f4f6; border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 7px; margin-bottom: 1.5rem;
+    }
+    .reset-btn {
+      padding: 10px 28px; border-radius: var(--radius);
+      background: var(--brand); color: #fff; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .reset-btn:hover { opacity: 0.85; }
+
+    /* ─── EMPTY ─── */
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .gtm-panel { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ COLE SEU GTM NOSCRIPT AQUI -->
+<!--
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+-->
+
+<header>
+  <div class="header-inner">
+    <div class="logo">loja<span>mock</span>.dev <small>GTM test store</small></div>
+    <button class="cart-btn" onclick="toggleCart()">
+      🛒 Carrinho
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="layout">
+
+    <!-- ─── COLUNA ESQUERDA ─── -->
+    <div>
+      <!-- PRODUTOS -->
+      <div id="products-view">
+        <p class="section-title">Produtos</p>
+        <div class="products-grid" id="products-grid"></div>
+      </div>
+
+      <!-- CARRINHO -->
+      <div id="cart-view">
+        <div class="cart-header">
+          <button class="back-btn" onclick="toggleCart()">← Voltar</button>
+          <span class="section-title" style="margin:0">Seu carrinho</span>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-summary">
+          <div class="summary-row"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+          <div class="summary-row"><span>Frete</span><span style="color:#16a34a">Grátis</span></div>
+          <div class="summary-total"><span>Total</span><span id="cart-total">R$ 0,00</span></div>
+          <button class="checkout-btn" id="checkout-btn" onclick="doCheckout()">Finalizar pedido</button>
+        </div>
+      </div>
+
+      <!-- SUCESSO -->
+      <div id="success-view">
+        <div class="success-card">
+          <div class="success-icon">✅</div>
+          <p class="success-title">Pedido realizado!</p>
+          <p class="success-sub">
+            O evento <strong>purchase</strong> foi enviado ao <code>dataLayer</code>.<br>
+            Verifique no GTM Preview ou no GA4 DebugView.
+          </p>
+          <div class="tx-id" id="tx-id"></div><br>
+          <button class="reset-btn" onclick="resetStore()">Fazer nova compra</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── COLUNA DIREITA: GTM PANEL ─── -->
+    <div class="gtm-panel">
+      <div class="gtm-panel-head">
+        <span class="gtm-badge">GTM</span>
+        <span class="gtm-title">dataLayer</span>
+      </div>
+      <p class="gtm-sub">Eventos disparados nesta sessão:</p>
+
+      <div class="dot-legend">
+        <div class="dot-item"><span class="dot d-pv"></span>page_view</div>
+        <div class="dot-item"><span class="dot d-vi"></span>view_item</div>
+        <div class="dot-item"><span class="dot d-ac"></span>add_to_cart</div>
+        <div class="dot-item"><span class="dot d-rc"></span>remove_from_cart</div>
+        <div class="dot-item"><span class="dot d-bc"></span>begin_checkout</div>
+        <div class="dot-item"><span class="dot d-pu"></span>purchase</div>
+      </div>
+
+      <div class="event-log" id="event-log">
+        <div class="empty">Interaja com a loja para ver eventos aqui.</div>
+      </div>
+
+      <div class="datalayer-raw" id="datalayer-raw">
+        <span style="color:#475569">// aguardando eventos...</span>
+      </div>
+
+      <button class="clear-btn" onclick="clearLog()">Limpar log</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ─── INICIALIZAR dataLayer ───
+  window.dataLayer = window.dataLayer || [];
+
+  // ─── PRODUTOS ───
+  const products = [
+    { id: 'SKU-001', name: 'Tênis Runner X', cat: 'Calçados',   price: 299.90, emoji: '👟' },
+    { id: 'SKU-002', name: 'Mochila Urban',  cat: 'Acessórios', price: 189.90, emoji: '🎒' },
+    { id: 'SKU-003', name: 'Camiseta Dry',   cat: 'Roupas',     price: 89.90,  emoji: '👕' },
+    { id: 'SKU-004', name: 'Boné Classic',   cat: 'Acessórios', price: 69.90,  emoji: '🧢' },
+    { id: 'SKU-005', name: 'Meias Pack 3',   cat: 'Roupas',     price: 49.90,  emoji: '🧦' },
+    { id: 'SKU-006', name: 'Garrafa Inox',   cat: 'Acessórios', price: 119.90, emoji: '🍶' },
+  ];
+
+  let cart = {};
+  let logEntries = [];
+  let cartOpen = false;
+
+  const dotClass = {
+    page_view: 'd-pv', view_item: 'd-vi', add_to_cart: 'd-ac',
+    remove_from_cart: 'd-rc', begin_checkout: 'd-bc', purchase: 'd-pu'
+  };
+
+  function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+
+  // ─── PUSH EVENT ───
+  function pushEvent(name, data) {
+    const payload = { event: name, ...data };
+    window.dataLayer.push(payload);
+    logEntries.unshift({ name, ...data });
+    renderLog();
+  }
+
+  // ─── RENDER LOG ───
+  function renderLog() {
+    const logEl = document.getElementById('event-log');
+    const rawEl = document.getElementById('datalayer-raw');
+
+    if (!logEntries.length) {
+      logEl.innerHTML = '<div class="empty">Interaja com a loja para ver eventos aqui.</div>';
+      rawEl.innerHTML = '<span style="color:#475569">// aguardando eventos...</span>';
+      return;
+    }
+
+    logEl.innerHTML = logEntries.slice(0, 10).map(e => {
+      const dc = dotClass[e.name] || 'd-pv';
+      const detail = e.item_name ? ` — ${e.item_name}` : (e.transaction_id ? ` — ${e.transaction_id}` : '');
+      return `<div class="event-entry">
+        <span class="dot ${dc}"></span>
+        <strong>${e.name}</strong>
+        <span>${detail}</span>
+      </div>`;
+    }).join('');
+
+    const last = logEntries[0];
+    const lines = Object.entries(last).map(([k, v]) => {
+      if (k === 'name') return '';
+      const val = typeof v === 'object' ? JSON.stringify(v) : (typeof v === 'string' ? `"${v}"` : v);
+      return `  <span class="ev-key">${k}</span><span class="ev-sep">: </span><span class="ev-val">${val}</span>`;
+    }).filter(Boolean).join('\n');
+
+    rawEl.innerHTML = `<span class="ev-sep">dataLayer.push({</span>\n  <span class="ev-key">event</span><span class="ev-sep">: </span><span class="ev-name">"${last.name}"</span>${lines ? ',\n' + lines : ''}\n<span class="ev-sep">})</span>`;
+  }
+
+  function clearLog() {
+    logEntries = [];
+    renderLog();
+  }
+
+  // ─── RENDER PRODUCTS ───
+  function renderProducts() {
+    document.getElementById('products-grid').innerHTML = products.map(p => {
+      const inCart = !!cart[p.id];
+      return `<div class="product-card" onclick="viewItem('${p.id}')">
+        <div class="product-img">${p.emoji}</div>
+        <div class="product-meta">
+          <div class="product-cat">${p.cat}</div>
+          <div class="product-name">${p.name}</div>
+        </div>
+        <div class="product-price">${fmt(p.price)}</div>
+        <button class="add-btn${inCart ? ' added' : ''}" onclick="event.stopPropagation(); addToCart('${p.id}')">
+          ${inCart ? '✓ Adicionado' : 'Adicionar ao carrinho'}
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  // ─── RENDER CART ───
+  function renderCart() {
+    const items = Object.values(cart);
+    const itemsEl = document.getElementById('cart-items');
+    const btn = document.getElementById('checkout-btn');
+
+    if (!items.length) {
+      itemsEl.innerHTML = '<div class="empty">Seu carrinho está vazio.</div>';
+      btn.disabled = true;
+      document.getElementById('subtotal').textContent = fmt(0);
+      document.getElementById('cart-total').textContent = fmt(0);
+      return;
+    }
+
+    btn.disabled = false;
+    const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+    document.getElementById('subtotal').textContent = fmt(total);
+    document.getElementById('cart-total').textContent = fmt(total);
+
+    itemsEl.innerHTML = items.map(i => `
+      <div class="cart-item">
+        <span class="cart-emoji">${i.emoji}</span>
+        <div class="cart-info">
+          <div class="cart-item-name">${i.name}</div>
+          <div class="cart-item-price">${fmt(i.price)} cada</div>
+        </div>
+        <div class="qty-controls">
+          <button class="qty-btn" onclick="changeQty('${i.id}',-1)">−</button>
+          <span class="qty-val">${i.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${i.id}',1)">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeItem('${i.id}')" title="Remover">✕</button>
+      </div>`).join('');
+  }
+
+  function updateCount() {
+    const n = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cart-count').textContent = n;
+  }
+
+  // ─── EVENTOS GA4 ───
+  function viewItem(id) {
+    const p = products.find(x => x.id === id);
+    pushEvent('view_item', {
+      currency: 'BRL', value: p.price,
+      item_id: p.id, item_name: p.name, item_category: p.cat, price: p.price
+    });
+  }
+
+  function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    if (cart[id]) cart[id].qty++;
+    else cart[id] = { ...p, qty: 1 };
+    pushEvent('add_to_cart', {
+      currency: 'BRL', value: p.price,
+      item_id: p.id, item_name: p.name, item_category: p.cat,
+      price: p.price, quantity: cart[id].qty
+    });
+    updateCount(); renderProducts(); renderCart();
+  }
+
+  function changeQty(id, delta) {
+    if (!cart[id]) return;
+    cart[id].qty += delta;
+    if (cart[id].qty <= 0) { removeItem(id); return; }
+    updateCount(); renderCart();
+  }
+
+  function removeItem(id) {
+    const i = cart[id];
+    if (!i) return;
+    pushEvent('remove_from_cart', {
+      currency: 'BRL', value: i.price,
+      item_id: i.id, item_name: i.name, quantity: i.qty
+    });
+    delete cart[id];
+    updateCount(); renderProducts(); renderCart();
+  }
+
+  function toggleCart() {
+    cartOpen = !cartOpen;
+    document.getElementById('products-view').style.display = cartOpen ? 'none' : 'block';
+    document.getElementById('cart-view').style.display = cartOpen ? 'block' : 'none';
+
+    if (cartOpen) {
+      renderCart();
+      const items = Object.values(cart);
+      if (items.length) {
+        const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+        pushEvent('begin_checkout', {
+          currency: 'BRL', value: total,
+          items: items.map(i => ({ item_id: i.id, item_name: i.name, quantity: i.qty, price: i.price }))
+        });
+      }
+    }
+  }
+
+  function doCheckout() {
+    const items = Object.values(cart);
+    const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+    const txId = 'ORD-' + Math.random().toString(36).slice(2,8).toUpperCase();
+
+    pushEvent('purchase', {
+      transaction_id: txId,
+      currency: 'BRL', value: total,
+      items: items.map(i => ({ item_id: i.id, item_name: i.name, quantity: i.qty, price: i.price }))
+    });
+
+    document.getElementById('tx-id').textContent = 'Transaction ID: ' + txId;
+    document.getElementById('cart-view').style.display = 'none';
+    document.getElementById('success-view').style.display = 'block';
+  }
+
+  function resetStore() {
+    cart = {};
+    cartOpen = false;
+    document.getElementById('success-view').style.display = 'none';
+    document.getElementById('products-view').style.display = 'block';
+    updateCount(); renderProducts();
+  }
+
+  // ─── INIT ───
+  renderProducts();
+  pushEvent('page_view', { page_title: 'LojaMock — Home', page_location: window.location.href });
+</script>
+</body>
+</html>
